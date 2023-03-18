@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { PropTypes } from 'prop-types';
+import { connect } from 'react-redux';
 import requestToken from '../services/requestToken';
+import { playerAction } from '../redux/actions';
 
 class Login extends Component {
   state = {
@@ -28,10 +30,13 @@ class Login extends Component {
 
   handleSubmit = async (event) => {
     event.preventDefault();
-    const { history } = this.props;
+    const { history, dispatch } = this.props;
+    const { name, email } = this.state;
 
     const response = await requestToken();
     localStorage.setItem('token', response.token);
+
+    dispatch(playerAction(name, email));
     history.push('/game');
   };
 
@@ -74,7 +79,7 @@ class Login extends Component {
           Play
         </button>
         <button
-          type="submit"
+          type="button"
           data-testid="btn-settings"
           onClick={ () => history.push('/settings') }
         >
@@ -88,7 +93,8 @@ class Login extends Component {
 Login.propTypes = {
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,
-  }).isRequired,
-};
+  }),
+  dispatch: PropTypes.func,
+}.isRequired;
 
-export default Login;
+export default connect(null)(Login);
