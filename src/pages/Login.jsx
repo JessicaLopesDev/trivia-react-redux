@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { PropTypes } from 'prop-types';
+import requestToken from '../services/requestToken';
 
 class Login extends Component {
   state = {
@@ -25,12 +26,21 @@ class Login extends Component {
     this.setState({ [name]: value }, () => this.handleLoginValidation());
   };
 
+  handleSubmit = async (event) => {
+    event.preventDefault();
+    const { history } = this.props;
+
+    const response = await requestToken();
+    localStorage.setItem('token', response.token);
+    history.push('/game');
+  };
+
   render() {
     const { name, email, isDisabled } = this.state;
     const { history } = this.props;
 
     return (
-      <form>
+      <form onSubmit={ (event) => this.handleSubmit(event) }>
         <h1>Trivia</h1>
         <label htmlFor="input-player-name">
           Nome
@@ -57,6 +67,7 @@ class Login extends Component {
           onChange={ this.handleChange }
         />
         <button
+          type="submit"
           data-testid="btn-play"
           disabled={ isDisabled }
         >
