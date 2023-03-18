@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
+import { PropTypes } from 'prop-types';
+import requestToken from '../services/requestToken';
 
-export default class Login extends Component {
+class Login extends Component {
   state = {
     name: '',
     email: '',
@@ -24,11 +26,20 @@ export default class Login extends Component {
     this.setState({ [name]: value }, () => this.handleLoginValidation());
   };
 
+  handleSubmit = async (event) => {
+    event.preventDefault();
+    const { history } = this.props;
+
+    const response = await requestToken();
+    localStorage.setItem('token', response.token);
+    history.push('/game');
+  };
+
   render() {
     const { name, email, isDisabled } = this.state;
 
     return (
-      <form>
+      <form onSubmit={ (event) => this.handleSubmit(event) }>
         <h1>Trivia</h1>
         <label htmlFor="input-player-name">
           Nome
@@ -55,6 +66,7 @@ export default class Login extends Component {
           onChange={ this.handleChange }
         />
         <button
+          type="submit"
           data-testid="btn-play"
           disabled={ isDisabled }
         >
@@ -64,3 +76,11 @@ export default class Login extends Component {
     );
   }
 }
+
+Login.propTypes = {
+  history: PropTypes.shape({
+    push: PropTypes.func.isRequired,
+  }).isRequired,
+};
+
+export default Login;
